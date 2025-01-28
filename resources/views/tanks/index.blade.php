@@ -2,9 +2,14 @@
 
 @section('content')
     <div class="container">
+        @if (session()->has('success'))
+                    <div class="alert alert-success" role="alert">
+                        <strong>Success!</strong> {{ session()->get('success') }}
+                    </div>
+                @endif
         <div class="row mb-3">
             <div class="col-4">
-                <a href="{{route('tanks.create')}}" class="btn btn-outline-primary">Add a new tank</a>
+                <a href="{{ route('tanks.create') }}" class="btn btn-outline-primary">Add a new tank</a>
             </div>
         </div>
         <div class="table-responsive">
@@ -23,9 +28,21 @@
                             <td>{{ $item->name }}</td>
                             <td>{{ $item->cost }}</td>
                             <td>{{ $item->crewnumber }}</td>
-                            <td><form action=""><button class="btn btn-info">Show</button></form></td>
-                            <td><form action=""><button class="btn btn-warning">Edit</button></form></td>
-                            <td><form action=""><button class="btn btn-danger">Delete</button></form></td>
+                            <td>
+                                <form action="{{ route('tanks.show', $item) }}" method="GET"><button
+                                        class="btn btn-info">Show</button></form>
+                            </td>
+                            <td>
+                                <form action="{{ route('tanks.edit', $item) }}" method="GET"><button
+                                        class="btn btn-warning">Edit</button></form>
+                            </td>
+                            <td>
+                                <form action="{{ route('tanks.destroy', $item) }}" method="POST">
+                                    @csrf
+                                    @method("DELETE")
+                                    <button class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

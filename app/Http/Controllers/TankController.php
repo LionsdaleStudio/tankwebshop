@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tank;
 use App\Http\Requests\StoreTankRequest;
 use App\Http\Requests\UpdateTankRequest;
+use Illuminate\Support\Facades\DB;
 
 class TankController extends Controller
 {
@@ -13,7 +14,7 @@ class TankController extends Controller
      */
     public function index()
     {
-        $tanks = Tank::all(); //Select * From tanks;
+        $tanks = Tank::all()->sortByDesc("id"); //Select * From tanks;
 
         return view("tanks.index", ["tanks" => $tanks]);
     }
@@ -31,7 +32,7 @@ class TankController extends Controller
      */
     public function store(StoreTankRequest $request)
     {
-        Tank::create($request->all());
+        $newTank = Tank::create($request->all());
 
         return back()->with("success", "You have a new tank. Grats!");
     }
@@ -41,7 +42,7 @@ class TankController extends Controller
      */
     public function show(Tank $tank)
     {
-        //
+        return view("tanks.show", ["tank" => $tank]);
     }
 
     /**
@@ -49,7 +50,8 @@ class TankController extends Controller
      */
     public function edit(Tank $tank)
     {
-        //
+        $tanktypes = DB::table("tanktypes")->get();
+        return view("tanks.edit", ["tank" => $tank, "tanktypes" => $tanktypes]);
     }
 
     /**
@@ -57,7 +59,8 @@ class TankController extends Controller
      */
     public function update(UpdateTankRequest $request, Tank $tank)
     {
-        //
+        $tank->update($request->all());
+        return back()->with("success", "{$tank->name} was successfully updated.");
     }
 
     /**
@@ -65,8 +68,21 @@ class TankController extends Controller
      */
     public function destroy(Tank $tank)
     {
-        //
+        $tank->delete();
+        return back()->with("success", "{$tank->name} was successfully deleted.");
     }
+
+    //Nincs útvonala, ha akarod tesztelni csinálj.
+    public function trashed() {
+        $tanks = Tank::onlyTrashed()->get();
+        dd($tanks);
+    }
+
+    public function restore(Tank $tank) {
+        $tank->restore();
+        return back()->with("success", "The tank was restored.");
+    }
+    /* Restore vége */
 
     /* Saját funkció paraméterrel */
     public function addCrewMember($member) {
